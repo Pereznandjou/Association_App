@@ -9,79 +9,153 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        ZStack {
-            // Dégradé de fond
-            LinearGradient(
-                gradient: Gradient(colors: [Color.orange, Color.pink]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .edgesIgnoringSafeArea(.all)
+        TabView {
+            HomeView()
+                .tabItem {
+                    Image(systemName: "house")
+                    Text("Home")
+                }
             
-            VStack(spacing: 40) {
-                // Logo de l'association
-                VStack {
-                    Image(systemName: "hands.sparkles") // Vous pouvez remplacer par une image personnalisée
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 100)
-                        .foregroundColor(.yellow)
-                    
-                    Text("MAIN TENDUE ASSOCIATION")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.top, 10)
+            DemandeView()
+                .tabItem {
+                    Image(systemName: "square.and.pencil")
+                    Text("Demande")
                 }
-                
-                // Boutons
-                HStack(spacing: 20) {
-                    // Bouton "J’ai besoin"
-                    Button(action: {
-                        print("J’ai besoin tapped")
-                    }) {
-                        VStack {
-                            Image(systemName: "hand.raised.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 40, height: 40)
-                                .foregroundColor(.black)
-                            Text("J’ai besoin")
-                                .font(.subheadline)
-                                .foregroundColor(.black)
-                        }
-                        .frame(width: 120, height: 120)
-                        .background(Color.yellow)
-                        .cornerRadius(10)
-                    }
-                    
-                    // Bouton "Je donne"
-                    Button(action: {
-                        print("Je donne tapped")
-                    }) {
-                        VStack {
-                            Image(systemName: "gift.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 40, height: 40)
-                                .foregroundColor(.black)
-                            Text("Je donne")
-                                .font(.subheadline)
-                                .foregroundColor(.black)
-                        }
-                        .frame(width: 120, height: 120)
-                        .background(Color.yellow)
-                        .cornerRadius(10)
-                    }
+            
+            LocalisationView()
+                .tabItem {
+                    Image(systemName: "map")
+                    Text("Localisation")
                 }
-            }
-            .padding()
+            
+            ContactView()
+                .tabItem {
+                    Image(systemName: "phone")
+                    Text("Contact")
+                }
+        }
+        .accentColor(.purple) // Personnalisation de la couleur des onglets
+    }
+}
+
+// Page "Home"
+struct HomeView: View {
+    var body: some View {
+        VStack {
+            Text("Bienvenue sur l'Accueil")
+                .font(.largeTitle)
+                .padding()
+            Spacer()
         }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+// Page "Demande" avec les 4 options
+struct DemandeView: View {
+    var body: some View {
+        VStack {
+            Text("Association")
+                .font(.title)
+                .bold()
+                .padding(.top, 20)
+            
+            GridView() // Affichage des 4 catégories
+                .padding()
+            
+            Spacer()
+        }
+    }
+}
+
+struct GridView: View {
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+            NavigationLink(destination: NutritionView()) {
+                CategoryCard(imageName: "fork.knife", title: "Nutrition")
+            }
+            NavigationLink(destination: LogementView()) {
+                CategoryCard(imageName: "bed.double", title: "Logement")
+            }
+            NavigationLink(destination: SanteView()) {
+                CategoryCard(imageName: "stethoscope", title: "Santé")
+            }
+            NavigationLink(destination: VestimentaireView()) {
+                CategoryCard(imageName: "tshirt", title: "Vestimentaire")
+            }
+        }
+    }
+}
+
+struct CategoryCard: View {
+    var imageName: String
+    var title: String
+    
+    var body: some View {
+        VStack {
+            Image(systemName: imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 50, height: 50)
+                .foregroundColor(.purple)
+            Text(title)
+                .font(.headline)
+        }
+        .frame(maxWidth: .infinity, maxHeight: 120)
+        .background(Color(UIColor.systemGray6))
+        .cornerRadius(10)
+        .shadow(radius: 2)
+    }
+}
+
+// Page "Localisation"
+struct LocalisationView: View {
+    var body: some View {
+        VStack {
+            Text("Localisation")
+                .font(.largeTitle)
+                .padding()
+            Spacer()
+        }
+    }
+}
+
+// Page "Contact"
+struct ContactView: View {
+    var body: some View {
+        VStack {
+            Text("Contactez-nous")
+                .font(.largeTitle)
+                .padding()
+            Spacer()
+        }
+    }
+}
+
+// Pages pour les catégories
+struct NutritionView: View {
+    var body: some View {
+        Text("Page Nutrition")
+            .font(.largeTitle)
+    }
+}
+
+struct LogementView: View {
+    var body: some View {
+        Text("Page Logement")
+            .font(.largeTitle)
+    }
+}
+
+struct SanteView: View {
+    var body: some View {
+        Text("Page Santé")
+            .font(.largeTitle)
+    }
+}
+
+struct VestimentaireView: View {
+    var body: some View {
+        Text("Page Vestimentaire")
+            .font(.largeTitle)
     }
 }
