@@ -8,154 +8,69 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Image(systemName: "house")
-                    Text("Home")
-                }
-            
-            DemandeView()
-                .tabItem {
-                    Image(systemName: "square.and.pencil")
-                    Text("Demande")
-                }
-            
-            LocalisationView()
-                .tabItem {
-                    Image(systemName: "map")
-                    Text("Localisation")
-                }
-            
-            ContactView()
-                .tabItem {
-                    Image(systemName: "phone")
-                    Text("Contact")
-                }
-        }
-        .accentColor(.purple) // Personnalisation de la couleur des onglets
-    }
-}
+    @State private var showWelcomeScreen = true // État pour afficher ou masquer le fullScreenCover
+    @State private var isInDonView = false // État pour vérifier si on est sur DonView
 
-// Page "Home"
-struct HomeView: View {
-    var body: some View {
-        VStack {
-            Text("Bienvenue sur l'Accueil")
-                .font(.largeTitle)
-                .padding()
-            Spacer()
-        }
+    init() {
+        UITabBar.appearance().backgroundColor = UIColor.systemGray6 // Change la couleur de fond de la barre des onglets
     }
-}
-
-// Page "Demande" avec les 4 options
-struct DemandeView: View {
-    var body: some View {
-        VStack {
-            Text("Association")
-                .font(.title)
-                .bold()
-                .padding(.top, 20)
-            
-            GridView() // Affichage des 4 catégories
-                .padding()
-            
-            Spacer()
-        }
-    }
-}
-
-struct GridView: View {
-    var body: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-            NavigationLink(destination: NutritionView()) {
-                CategoryCard(imageName: "fork.knife", title: "Nutrition")
-            }
-            NavigationLink(destination: LogementView()) {
-                CategoryCard(imageName: "bed.double", title: "Logement")
-            }
-            NavigationLink(destination: SanteView()) {
-                CategoryCard(imageName: "stethoscope", title: "Santé")
-            }
-            NavigationLink(destination: VestimentaireView()) {
-                CategoryCard(imageName: "tshirt", title: "Vestimentaire")
-            }
-        }
-    }
-}
-
-struct CategoryCard: View {
-    var imageName: String
-    var title: String
     
     var body: some View {
-        VStack {
-            Image(systemName: imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 50, height: 50)
-                .foregroundColor(.purple)
-            Text(title)
-                .font(.headline)
+        ZStack {
+            if isInDonView {
+                DonView(onBack: {
+                    // Actions à effectuer lors du retour
+                    showWelcomeScreen = true
+                    isInDonView = false
+                })
+
+            } else {
+                TabView {
+                    HomeView()
+                        .tabItem {
+                            Image(systemName: "house")
+                            Text("Home")
+                        }
+                    
+                    DemandeView()
+                        .tabItem {
+                            Image(systemName: "square.and.pencil")
+                            Text("Demande")
+                        }
+                    
+                    LocalisationView()
+                        .tabItem {
+                            Image(systemName: "map")
+                            Text("Localisation")
+                        }
+                    
+                    ContactView()
+                        .tabItem {
+                            Image(systemName: "phone")
+                            Text("Contact")
+                        }
+                }
+                .accentColor(.purple)
+                .onAppear {
+                    UITabBar.appearance().unselectedItemTintColor = UIColor.gray
+                }
+                .fullScreenCover(isPresented: $showWelcomeScreen) {
+                    WelcomeScreen(
+                        onClose: {
+                            showWelcomeScreen = false
+                        },
+                        onNavigateToDonView: {
+                            showWelcomeScreen = false
+                            isInDonView = true
+                        }
+                    )
+                }
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: 120)
-        .background(Color(UIColor.systemGray6))
-        .cornerRadius(10)
-        .shadow(radius: 2)
     }
 }
 
-// Page "Localisation"
-struct LocalisationView: View {
-    var body: some View {
-        VStack {
-            Text("Localisation")
-                .font(.largeTitle)
-                .padding()
-            Spacer()
-        }
-    }
-}
 
-// Page "Contact"
-struct ContactView: View {
-    var body: some View {
-        VStack {
-            Text("Contactez-nous")
-                .font(.largeTitle)
-                .padding()
-            Spacer()
-        }
-    }
-}
-
-// Pages pour les catégories
-struct NutritionView: View {
-    var body: some View {
-        Text("Page Nutrition")
-            .font(.largeTitle)
-    }
-}
-
-struct LogementView: View {
-    var body: some View {
-        Text("Page Logement")
-            .font(.largeTitle)
-    }
-}
-
-struct SanteView: View {
-    var body: some View {
-        Text("Page Santé")
-            .font(.largeTitle)
-    }
-}
-
-struct VestimentaireView: View {
-    var body: some View {
-        Text("Page Vestimentaire")
-            .font(.largeTitle)
-    }
+#Preview {
+    ContentView()
 }
