@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-
 struct HomeView: View {
     @State private var navigateToWelcome = false
     @State private var isNavigatingToDon = false // État pour gérer la navigation vers "Je donne"
@@ -27,7 +26,7 @@ struct HomeView: View {
                         Button(action: {
                             navigateToWelcome.toggle()
                         }) {
-                            Image(systemName: "power")
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
                                 .font(.title)
                                 .foregroundColor(.white)
                                 .padding()
@@ -35,6 +34,7 @@ struct HomeView: View {
                         .background(Circle().fill(Color.black.opacity(0.6)))
                         .padding(.top, 40)
                         .padding(.leading, 20)
+                        
                         .fullScreenCover(isPresented: $navigateToWelcome) {
                             WelcomeScreen(
                                 onClose: {
@@ -56,6 +56,12 @@ struct HomeView: View {
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding()
+                    Image("logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                        .padding(.vertical, 30)  // Espacement entre le texte et le logo
+                        .shadow(radius: 10)
                     
                     Text("Nous sommes là pour vous aider.")
                         .font(.title2)

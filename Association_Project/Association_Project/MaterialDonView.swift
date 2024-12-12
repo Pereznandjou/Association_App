@@ -7,15 +7,19 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct MaterialDonView: View {
+    @State private var nom: String = ""
+    @State private var prenom: String = ""
+    @State private var adresseExpediteur: String = ""
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
+
     var onBack: () -> Void
 
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // En-tête
+                // En-tête avec retour
                 HStack {
                     Button(action: {
                         onBack()
@@ -23,84 +27,150 @@ struct MaterialDonView: View {
                         Image(systemName: "arrow.left")
                             .resizable()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(.white)
+                            .foregroundColor(.gray)
                             .padding()
                     }
                     Spacer()
                 }
-                .background(Color.orange)
 
+                // Titre principal
                 Text("Faire un Don Matériel")
                     .font(.largeTitle)
                     .bold()
                     .padding()
-                    .foregroundColor(.white)
+                    .foregroundColor(.gray)
                     .frame(maxWidth: .infinity)
-                    .background(Color.orange)
                 
                 // Description
-                Text("Contribuez en envoyant des vêtements, des couvertures, des produits d'hygiène ou des jouets via les adresses et associations ci-dessous.")
+                Text("Aidez les sans-abris en envoyant des dons matériels ou en les déposant à un point de collecte proche. Vous pouvez également générer un bandeau d'envoi pour vos colis.")
                     .font(.body)
                     .padding(.horizontal)
                     .multilineTextAlignment(.center)
-                
-                // Section : Adresses postales
+
+                // Liste des Associations
                 SectionView(
-                    title: "Adresses pour envoyer vos dons",
-                    description: "Envoyez vos dons directement aux adresses suivantes :",
-                    content: [
-                        "Les Restos du Cœur: 45 Rue de l'Avenir, 75000 Paris",
-                        "Emmaüs: 22 Allée des Solidaires, 69000 Lyon",
-                        "La Croix-Rouge: 10 Boulevard de l'Espoir, 13000 Marseille",
-                        "Secours Populaire: 8 Place de la Fraternité, 33000 Bordeaux"
-                    ],
-                    isLink: false
+                    title: "Associations",
+                    description: "Voici des associations où vous pouvez faire un don matériel :",
+                    links: [
+                        ("Les Restos du Cœur", "https://www.restosducoeur.org"),
+                        ("Emmaüs", "https://www.emmaus-france.org"),
+                        ("La Croix-Rouge", "https://www.croix-rouge.fr"),
+                        ("Secours Populaire", "https://www.secourspopulaire.fr")
+                    ]
                 )
-                
-                // Points de Collecte
-                VStack {
-                    Text("Déposez vos dons près de chez vous")
-                        .font(.headline)
-                        .padding(.bottom, 10)
-                    
-                    Button(action: {
-                        // Action pour afficher une carte ou une liste des points de collecte
-                        print("Afficher les points de collecte")
-                    }) {
-                        Text("Voir les points de collecte")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                            .shadow(radius: 5)
-                    }
+                .padding(.horizontal)
+
+                Text("Envoyer un colis")
+
+
+                // Formulaire pour générer un bandeau d'envoi
+                VStack(spacing: 15) {
+                    TextField("Nom", text: $nom)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
+
+                    TextField("Prénom", text: $prenom)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
+
+                    TextField("Adresse de l'expéditeur", text: $adresseExpediteur)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
                 }
                 .padding(.horizontal)
-                
-                // Plateformes en ligne
-                SectionView(
-                    title: "Partagez vos dons en ligne",
-                    description: "Utilisez ces plateformes pour donner directement vos objets :",
-                    content: [
-                        "https://www.geev.com",
-                        "https://www.leboncoin.fr"
-                    ],
-                    isLink: true
-                )
+
+                // Bouton pour générer le bandeau
+                Button(action: {
+                    if nom.isEmpty || prenom.isEmpty || adresseExpediteur.isEmpty {
+                        alertMessage = "Veuillez remplir tous les champs pour générer le bandeau."
+                        showAlert = true
+                    } else {
+                        generateBandeau(nom: nom, prenom: prenom, adresse: adresseExpediteur)
+                    }
+                }) {
+                    Text("Télécharger votre bandeau d'envoi")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
+                }
+                .padding(.horizontal)
+                .alert(isPresented: $showAlert) {
+                    Alert(
+                        title: Text("Information"),
+                        message: Text(alertMessage),
+                        dismissButton: .default(Text("OK"))
+                    )
+                }
+
+                Spacer()
+
+                // Footer inspirant
+                Text("Merci pour votre générosité et votre soutien!")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                    .padding()
             }
             .padding()
         }
         .background(Color(.systemGray6))
     }
+
+    private func generateBandeau(nom: String, prenom: String, adresse: String) {
+        // Contenu du bandeau
+        let bandeauContent = """
+        Expéditeur :
+        \(prenom) \(nom)
+        \(adresse)
+        
+        Merci de coller ce bandeau sur votre colis avant l'envoi.
+        """
+        
+        // Génération du PDF
+        let fileName = "Bandeau_Don.pdf"
+        let pdfPath = NSTemporaryDirectory() + fileName
+        let renderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 300, height: 150))
+        
+        do {
+            let data = renderer.pdfData { context in
+                context.beginPage()
+                
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.alignment = .center
+                
+                let attributes: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.systemFont(ofSize: 12),
+                    .paragraphStyle: paragraphStyle
+                ]
+                
+                let attributedString = NSAttributedString(string: bandeauContent, attributes: attributes)
+                attributedString.draw(in: CGRect(x: 10, y: 10, width: 280, height: 130))
+            }
+            
+            try data.write(to: URL(fileURLWithPath: pdfPath))
+            alertMessage = "Le bandeau a été généré avec succès et se trouve à l'emplacement : \(pdfPath)"
+            showAlert = true
+        } catch {
+            alertMessage = "Erreur lors de la génération du bandeau : \(error.localizedDescription)"
+            showAlert = true
+        }
+    }
 }
+
 struct SectionView: View {
     let title: String
     let description: String
-    let content: [String] // Contient soit les adresses, soit les descriptions des liens
-    let isLink: Bool // Si `true`, le contenu est interprété comme des liens
-
+    let links: [(String, String)]
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
@@ -110,16 +180,10 @@ struct SectionView: View {
                 .font(.subheadline)
                 .foregroundColor(.gray)
             
-            ForEach(content, id: \.self) { item in
-                if isLink, let url = URL(string: item) {
-                    Link(item, destination: url)
-                        .font(.body)
-                        .foregroundColor(.blue)
-                } else {
-                    Text(item)
-                        .font(.body)
-                        .foregroundColor(.black)
-                }
+            ForEach(links, id: \.0) { link in
+                Link(link.0, destination: URL(string: link.1)!)
+                    .font(.body)
+                    .foregroundColor(.blue)
             }
         }
         .padding()
@@ -128,7 +192,6 @@ struct SectionView: View {
         .shadow(radius: 5)
     }
 }
-
 
 #Preview {
     MaterialDonView {

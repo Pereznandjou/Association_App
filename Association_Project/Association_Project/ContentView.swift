@@ -8,42 +8,58 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showWelcomeScreen = true // État pour afficher ou masquer le fullScreenCover
-    @State private var isInDonView = false // État pour vérifier si on est sur DonView
+    @State private var currentView: ViewType = .welcome // État global pour suivre la vue courante
+
+    enum ViewType {
+        case welcome
+        case home
+        case demande
+        case localisation
+        case contact
+        case don
+    }
 
     init() {
         UITabBar.appearance().backgroundColor = UIColor.systemGray6 // Change la couleur de fond de la barre des onglets
     }
-    
+
     var body: some View {
         ZStack {
-            if isInDonView {
+            switch currentView {
+            case .don:
                 DonView(onBack: {
-                    // Actions à effectuer lors du retour
-                    showWelcomeScreen = true
-                    isInDonView = false
+                    currentView = .welcome // Revenir à WelcomeScreen
                 })
-
-            } else {
+            case .welcome:
+                WelcomeScreen(
+                    onClose: {
+                        currentView = .home // Retour à la vue d'accueil (par exemple)
+                    },
+                    onNavigateToDonView: {
+                        currentView = .don // Aller à DonView
+                    }
+                )
+            default:
                 TabView {
                     HomeView()
                         .tabItem {
                             Image(systemName: "house")
                             Text("Home")
                         }
-                    
+                        
+
                     DemandeView()
                         .tabItem {
-                            Image(systemName: "square.and.pencil")
+                            Image(systemName: "square.grid.2x2.fill")
                             Text("Demande")
                         }
-                    
+                        
                     LocalisationView()
                         .tabItem {
-                            Image(systemName: "map")
+                            Image(systemName: "mappin.and.ellipse")
                             Text("Localisation")
                         }
-                    
+
                     ContactView()
                         .tabItem {
                             Image(systemName: "phone")
@@ -54,22 +70,10 @@ struct ContentView: View {
                 .onAppear {
                     UITabBar.appearance().unselectedItemTintColor = UIColor.gray
                 }
-                .fullScreenCover(isPresented: $showWelcomeScreen) {
-                    WelcomeScreen(
-                        onClose: {
-                            showWelcomeScreen = false
-                        },
-                        onNavigateToDonView: {
-                            showWelcomeScreen = false
-                            isInDonView = true
-                        }
-                    )
-                }
             }
         }
     }
 }
-
 
 #Preview {
     ContentView()

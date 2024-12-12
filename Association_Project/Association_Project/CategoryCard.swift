@@ -17,7 +17,7 @@ struct CategoryCard: View {
             Image(imageName)
                 .resizable()
                 .scaledToFill()
-                .frame(width: 100, height: 100)
+                .frame(width: 150, height: 150)
                 .cornerRadius(10)
                 .clipped()
             
@@ -30,7 +30,7 @@ struct CategoryCard: View {
                 .shadow(radius: 5)
         }
         .frame(maxWidth: .infinity, maxHeight: 180)
-        .background(LinearGradient(gradient: Gradient(colors: [Color.white.opacity(0.7), Color.purple.opacity(0.7)]), startPoint: .top, endPoint: .bottom))
+        
         .cornerRadius(15)
         .shadow(radius: 10)
     }
